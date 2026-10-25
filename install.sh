@@ -2,6 +2,8 @@
 set -euo pipefail
 
 CHANGED=0
+TMPFILES=()
+trap 'rm -f "${TMPFILES[@]}"' EXIT
 UPDATE=1
 CFG=""
 
@@ -70,6 +72,7 @@ state_del() {
   [[ -f "$STATE" ]] || return 0
   grep -q "^$1 " "$STATE" || return 0
   local tmp="$STATE.tmp.$$"
+  TMPFILES+=("$tmp")
   { grep -v "^$1 " "$STATE" || true; } >"$tmp"
   mv "$tmp" "$STATE"
 }
@@ -77,6 +80,7 @@ state_del() {
 state_set() {
   [[ "$(state_get "$1")" == "$2" ]] && return 0
   local tmp="$STATE.tmp.$$"
+  TMPFILES+=("$tmp")
   if [[ -f "$STATE" ]]; then
     { grep -v "^$1 " "$STATE" || true; } >"$tmp"
   else
@@ -238,6 +242,7 @@ write_config() {
   fi
 
   tmp="$CFG/.$name.json.tmp.$$"
+  TMPFILES+=("$tmp")
   jq -n --slurpfile a "$shared" --slurpfile b "$local_f" -L "$REPO/lib" \
     'include "merge"; merge($a[0]; $b[0])' | jq . >"$tmp"
   h="$(hash_of "$tmp")"

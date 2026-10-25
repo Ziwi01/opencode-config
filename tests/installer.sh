@@ -189,3 +189,42 @@ test_missing_jq_fails() {
   assert_eq 1 "$rc" rc
   grep -q jq "$TMP/err"
 }
+
+test_merge_failure_cleans_temp() {
+  setup_fx
+  mkdir -p "$CFG" "$TMP/bin"
+  echo '{"model":"m"}' >"$CFG/opencode.local.json"
+  real=$(command -v jq)
+  # shellcheck disable=SC2016
+  printf '#!/bin/bash\nfor a in "$@"; do [[ "$a" == *include* ]] && exit 5; done\nexec %s "$@"\n' "$real" >"$TMP/bin/jq"
+  chmod +x "$TMP/bin/jq"
+  rc=0
+  PATH="$TMP/bin:$PATH" inst >"$TMP/out" 2>"$TMP/err" || rc=$?
+  [[ "$rc" != 0 ]]
+  [[ ! -e "$CFG/opencode.json" || -L "$CFG/opencode.json" ]]
+  assert_eq "" "$(find "$CFG" -name '*.tmp.*')" leftover
+}
+
+test_shared_non_symlink_fails() {
+  setup_fx
+  mkdir -p "$CFG/shared"
+  echo keep >"$CFG/shared/f"
+  rc=0
+  inst >"$TMP/out" 2>"$TMP/err" || rc=$?
+  assert_eq 1 "$rc" rc
+  grep -q shared "$TMP/err"
+  assert_eq "$CFG
+$CFG/shared
+$CFG/shared/f" "$(find "$CFG" | sort)"
+}
+
+test_shared_entry_name_clash_skipped() {
+  setup_fx
+  mkdir -p "$FX/plugins/demo" "$CFG/plugins/demo"
+  : >"$FX/plugins/demo/index.ts"
+  : >"$CFG/plugins/demo/mine"
+  inst >"$TMP/out" 2>"$TMP/err"
+  grep -q 'demo' "$TMP/err"
+  [[ -d "$CFG/plugins/demo" && ! -L "$CFG/plugins/demo" && -f "$CFG/plugins/demo/mine" ]]
+  assert_eq changed "$(last_line "$(cat "$TMP/out")")"
+}
