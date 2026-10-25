@@ -45,6 +45,11 @@ Read-only investigation needs no approval. Go and look before proposing.
   you think you remember the answer — training data goes stale, and confidently wrong API
   usage is worse than a lookup.
 - Prefer reading the actual source or config over inferring behaviour from names.
+- **Review handoff.** `/revdiff` and hunk only show the session's directory. When changes
+  for the user to review live elsewhere (a worktree, a separate clone, another repository),
+  follow the `review-handoff` skill before reporting back, and again when the review ends.
+  When a review ends with no change requests left, copy the changes into the main checkout
+  the worktree or clone came from, uncommitted, as the skill describes.
 
 ## Communication
 
