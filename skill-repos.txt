@@ -1,0 +1,5 @@
+# Git repositories that provide more skills, one per line:
+#   <name> <git-url> [<ref>]
+# <ref> defaults to the remote's default branch.
+# Clones go to vendor/<name>. Machine-only entries belong in
+# ~/.config/opencode/skill-repos.local.txt.
