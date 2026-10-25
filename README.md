@@ -22,7 +22,9 @@ cd opencode-config
 The clone can live anywhere. The installer prints `changed` or `ok` as its last line and is
 safe to re-run. `--config-dir DIR` targets another config directory (default
 `$XDG_CONFIG_HOME/opencode`, else `~/.config/opencode`); `--no-update` skips the skill
-repositories. Proveasio can also install and update it
+repositories. `opencode.json` refers to `~/.config/opencode/shared/...`, so with another config
+directory (`XDG_CONFIG_HOME` or `--config-dir`) override `instructions` and `skills` in
+`opencode.local.json`. Proveasio can also install and update it
 on a workstation.
 
 ## Layout

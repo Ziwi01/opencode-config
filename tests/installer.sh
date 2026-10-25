@@ -228,3 +228,30 @@ test_shared_entry_name_clash_skipped() {
   [[ -d "$CFG/plugins/demo" && ! -L "$CFG/plugins/demo" && -f "$CFG/plugins/demo/mine" ]]
   assert_eq changed "$(last_line "$(cat "$TMP/out")")"
 }
+
+test_foreign_symlink_backed_up() {
+  setup_fx
+  mkdir -p "$CFG"
+  echo '{"mine":true}' >"$TMP/mine.json"
+  ln -s "$TMP/mine.json" "$CFG/opencode.json"
+  inst >"$TMP/out" 2>"$TMP/err"
+  grep -q 'opencode.json.bak-' "$TMP/err"
+  [[ -L "$(compgen -G "$CFG/opencode.json.bak-*")" ]]
+  assert_eq "$TMP/mine.json" "$(readlink "$CFG"/opencode.json.bak-*)" backup
+  assert_eq "$CFG/shared/opencode.json" "$(readlink "$CFG/opencode.json")" ours
+  echo '{}' >"$CFG/cli.local.json"
+  rm "$CFG/cli.json"
+  ln -s "$TMP/mine.json" "$CFG/cli.json"
+  inst >/dev/null 2>"$TMP/err"
+  compgen -G "$CFG/cli.json.bak-*" >/dev/null
+  [[ -f "$CFG/cli.json" && ! -L "$CFG/cli.json" ]]
+}
+
+test_jsonc_present_warns() {
+  setup_fx
+  mkdir -p "$CFG"
+  echo '{}' >"$CFG/opencode.jsonc"
+  inst >/dev/null 2>"$TMP/err"
+  grep -q 'opencode.jsonc' "$TMP/err"
+  assert_eq '{}' "$(cat "$CFG/opencode.jsonc")" untouched
+}

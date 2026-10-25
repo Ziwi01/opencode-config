@@ -220,12 +220,13 @@ write_config() {
     die "$target is a directory"
   fi
 
+  if [[ -L "$target" && "$(readlink "$target")" != "$want" ]]; then
+    backup "$target"
+  fi
+
   if [[ ! -f "$local_f" ]]; then
     if [[ -L "$target" ]]; then
-      if [[ "$(readlink "$target")" != "$want" ]]; then
-        ln -sfn "$want" "$target"
-        CHANGED=1
-      fi
+      :
     else
       if [[ -f "$target" ]]; then
         if [[ "$(hash_of "$target")" == "$(state_get "$name.json")" ]]; then
@@ -275,6 +276,10 @@ if ((UPDATE)); then
 fi
 write_config opencode
 write_config cli
+
+for f in "$CFG/opencode.jsonc" "$CFG/cli.jsonc"; do
+  [[ ! -e "$f" ]] || warn "$f exists next to the managed ${f%c}; merge it into $(basename "${f%.jsonc}").local.json or remove it"
+done
 
 if ((CHANGED)); then
   echo changed

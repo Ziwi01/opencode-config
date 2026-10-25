@@ -88,7 +88,7 @@ When asked to add a rule, skill, plugin, MCP server or setting, decide where it 
   or generated files.
 - Shared changes reach other machines only after commit and push. On Proveasio-managed
   machines the clone behind `~/.config/opencode/shared` may be
-  `~/.local/share/opencode-config`, which Proveasio resets on update — edit the user's own
+  `~/.local/share/opencode-config`, which Proveasio will not update while it has local changes — edit the user's own
   working clone of the opencode-config repository instead when one exists, and ask if
   unsure where it is.
 - When unsure, ask.
