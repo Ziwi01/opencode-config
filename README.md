@@ -16,7 +16,7 @@ instructions, skills, plugins and config overrides without editing this reposito
 ```bash
 git clone <url> opencode-config
 cd opencode-config
-bash install.sh
+./install.sh
 ```
 
 The clone can live anywhere. The installer prints `changed` or `ok` as its last line and is
@@ -36,16 +36,16 @@ on a workstation.
 | `skill-repos.txt` → `vendor/` | clones, found through the `skills` entry for `shared/vendor` |
 | `agents/`, `commands/`, `plugins/` | one symlink per entry |
 
-Machine-only files, never touched by the installer:
+Machine-only files, never touched by the installer (in `plugins/`, `agents/` and `commands/` it only manages the symlinks it created and removes its own dangling links; your own entries stay):
 
-- `AGENTS.md`, `skills/`, `plugins/`, `agents/`
+- `AGENTS.md`, `skills/`, your own entries in `plugins/`, `agents/` and `commands/`
 - `opencode.local.json`, `cli.local.json`
 - `skill-repos.local.txt`
 
 ## Overriding settings on one machine
 
 Create `opencode.local.json` or `cli.local.json` next to the config files and run
-`bash install.sh`. `opencode.json` then becomes a regular file holding the merge of shared
+`./install.sh`. `opencode.json` then becomes a regular file holding the merge of shared
 and local: objects merge recursively, arrays are concatenated (shared first, duplicates
 dropped), local scalars win. Remove a shared plugin with a `-name` entry in the local
 `plugins` array. Delete the local file and re-run the installer to get the symlink back.
@@ -69,7 +69,7 @@ that differ from shared ones.
 ## Updating
 
 ```bash
-git pull && bash install.sh && opencode plugin update
+git pull && ./install.sh && opencode plugin update
 ```
 
 ## Edited config files
@@ -77,7 +77,7 @@ git pull && bash install.sh && opencode plugin update
 `opencode mcp add --global` writes through the `opencode.json` symlink, so the change lands
 in this repository's `opencode.json` and shows in `git status` (checked with OpenCode
 2.1.4: the symlink stays a symlink). Commit it if it should be shared, otherwise revert it
-and put the server in `opencode.local.json`.
+and put the server in `opencode.local.json`. When the clone is managed by Proveasio (`~/.local/share/opencode-config`), such a write leaves local changes in that clone and Proveasio's next update stops on them; move the change into your own working clone, commit and push, then reset the managed clone.
 
 When `opencode.json` or `cli.json` is a regular file, the installer records its hash in
 `~/.config/opencode/.opencode-config.state`. If the file no longer matches (edited, or it
