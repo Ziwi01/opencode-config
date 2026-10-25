@@ -49,7 +49,8 @@ Read-only investigation needs no approval. Go and look before proposing.
   for the user to review live elsewhere (a worktree, a separate clone, another repository),
   follow the `review-handoff` skill before reporting back, and again when the review ends.
   When a review ends with no change requests left, copy the changes into the main checkout
-  the worktree or clone came from, uncommitted, as the skill describes.
+  the worktree or clone came from, uncommitted, then remove the worktree or clone you
+  created, as the skill describes.
 
 ## Communication
 

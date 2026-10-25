@@ -94,11 +94,17 @@ back, or the worktree or clone is removed. Then:
      the patch also carries the committed changes.
    - New files: `git -C <dir> ls-files --others --exclude-standard`; copy each one.
    - Verify with `cmp` on every copied file and show `git -C <main> status --short`.
-3. `opencode.session_move({ directory: "<original dir>" })`.
-4. If you started hunk, `hunk-popup open <original dir>`. If it refuses because of notes, you
+3. **Remove the worktree or clone** once step 2 verified every file, if you created it.
+   Its changes are uncommitted, so removal needs force: `git -C <main> worktree remove --force
+   <dir>` (or the `worktree_remove` tool with `force: true` from that repository), or
+   `rm -rf <dir>` for a clone. Before that, check that it holds nothing step 2 did not copy:
+   no commits that are not in `<main>`, no files `cmp` did not cover. Remove the empty parent
+   directory you made for it. Never remove a worktree or clone the user created; ask.
+4. `opencode.session_move({ directory: "<original dir>" })`.
+5. If you started hunk, `hunk-popup open <original dir>`. If it refuses because of notes, you
    read them in step 1: repeat with `--force`. If hunk no longer runs, skip this; Alt+h starts
    it in the pane's directory.
-5. Tell the user that the session and hunk are back in `<original dir>`, and where the
-   changes were copied.
+6. Tell the user that the session and hunk are back in `<original dir>`, where the changes
+   were copied, and that the worktree or clone is removed.
 
-Do not commit, merge, push or remove the worktree or clone as part of this. Ask.
+Do not commit, merge or push as part of this. Ask.
