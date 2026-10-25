@@ -33,6 +33,8 @@ test_merge_type_mismatch_local_wins() {
   assert_eq '{"a":{"b":1}}' "$(run_merge '{"a":[1]}' '{"a":{"b":1}}')"
 }
 
+source "$REPO/tests/installer.sh"
+
 main() {
   local fails=0 name
   mkdir -p /tmp/opencode
@@ -40,6 +42,7 @@ main() {
     if out=$(
       TMP="$(mktemp -d /tmp/opencode/test.XXXXXX)"
       trap 'rm -rf "$TMP"' EXIT
+      set -e
       "$name" 2>&1
     ); then
       echo "PASS $name"
